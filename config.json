@@ -1,0 +1,13 @@
+{
+	"prefix": "!",
+	"port": 8080,
+	"username": "",
+	"channel": [""],
+	"img": "\\img\\logo.png",
+	"title": "TwitchBOT",
+	"token": "",
+	"mongodb": "",
+	"error":{
+		"notfound": " Hmmm can't Find this Command!!"
+	}
+}
