@@ -1,0 +1,263 @@
+
+<!--suppress JSUnresolvedLibraryURL, JSJQueryEfficiency, JSUnresolvedFunction, JSUnresolvedVariable, JSUnusedLocalSymbols, HtmlFormInputWithoutLabel -->
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    
+ <script src="//kit.fontawesome.com/7b3fe3045c.js"></script>
+ <link rel=icon href="<%= icon %>" sizes="16x16" type="image/png">
+ <link rel='apple-touch-icon' type='image/png' href='<%= icon %>'> <!-- iPhone -->
+ <link rel='apple-touch-icon' type='image/png' sizes='72x72' href='<%= icon %>'> <!-- iPad -->
+ <link rel='apple-touch-icon' type='image/png' sizes='114x114' href='<%= icon %>'> <!-- iPhone4 -->
+ <meta name="<%= title %>" content="lsForums">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <title><%= title %></title>
+
+
+    <!-- Bootstrap -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/main.css" rel="stylesheet">
+    <link href="css/giveaway.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600" rel="stylesheet">
+</head>
+<body>
+        <div id="mySidenav" class="sidenav">
+            <a class="title" href="javascript:void(0)"><img width="50" height="50" src="<%= icon %>" /></br><span><%= title %></span></a>
+            <a  href="/" style="font-size: medium"><span class="glyphicon glyphicon-flash"></span>&nbsp;Commands</a>
+            <a class = activeNav href="giveaway.php" style="font-size: medium"><span class="glyphicon glyphicon-gift"></span>&nbsp;&nbsp;Giveaway</a>
+            <!--<a  href="#" style="font-size: medium"><span class="glyphicon glyphicon-info-sign"></span> &nbsp;About</a>-->
+        </div>
+<div class="container-fluid" style="padding: 0 0 0 0 !important;">
+    <div id="main">
+        <!--    <button class="btn" onclick="toggleNav()" style="background-color: #1d89cf"><span class="glyphicon glyphicon-menu-hamburger" aria-hidden="true" style="color: #fff;"></span></button> <h1>Hello, world2!</h1>-->
+        <div class="table-title">
+            <br>
+            Giveaways
+            <br>
+            <ol class="location breadcrumb">
+                <li>Home</li>
+                <li>Giveaways</li>
+            </ol>
+        </div>
+        <br>
+        <div class="content-box row col-md-12" style="background-color: transparent !important;">
+            <div class="col-md-4 column">
+                <div class="column-content">
+                    <div class="titleGiveaway">Users <span class="userCount"><span id="userCount">0</span>/<span id="totalUserCount">0</span> Users</span>
+                    </div>
+                    <div class="form-group">
+                        <input id="searchUsers" class="form-control" placeholder="Search..."/>
+                    </div>
+                    <div>
+                        <ul id="enrolledUsers"></ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 column">
+                <div class="column-content">
+                    <div class="titleGiveaway">Giveaway Type</div>
+                    <div class="form-group">
+                        <label class="col-lg-3 control-label">Keyword</label>
+                        <div class="col-lg-9">
+                            <input type="text" id="keyword" placeholder="keyword" class="form-control" maxlength="100"/>
+                        </div>
+                    </div>
+                    <div style="padding-top: 40px;">
+                        <button type="button" id="runGiveawayButton" onclick="run()" class="btn btn-block btn-primary">
+                            Start Giveaway!
+                        </button>
+                        <button type="button" id="getWinnerButton" onclick="getResult()"
+                                class="btn btn-block btn-primary" disabled>Get Winner!
+                        </button>
+                    </div>
+                    <div id="noWinner" style="padding-top: 40px;">
+                        <h3>No winner yet...</h3>
+                    </div>
+                    <div id="hasWinner" style="padding-top: 40px; display: none;">
+                        <div class="contact-info">
+                            <img id="winnerAvatar"
+                                 class="winner-avatar"
+                                 src="/img/user.png"/>
+                            <div class="winner-info">
+                                <h3>
+                                    <strong id="winnerUsername">
+                                        Retrieving Username...
+                                    </strong>
+                                </h3>
+                            </div>
+                        </div>
+                        <div class="winner-msgs">
+                            <h3>Messages:<span id="winnerTimer">00:00:00</span></h3>
+                            <ul id="messagesList" class="list-group">
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 column">
+                <div class="column-content">
+                    <div class="titleGiveaway">Chat</div>
+                    <ul id="chat"></ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+<script src="/socket.io/socket.io.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="js/bootstrap.min.js"></script>
+<script>
+    var content, socket = io();
+	socket.on('connect', ()=>{console.log("Connected!")});
+    var contestants = [];
+    var shownContestants = [];
+    var started = false;
+    var winnerInterval = undefined;
+    var secondsCounter = 0;
+    var minutesCounter = 0;
+    var hoursCounter = 0;
+
+    $("#searchUsers").on("keyup", function() {
+        var keyword = $("#searchUsers").val();
+        shownContestants = [];
+        console.log(keyword);
+        for (var i = 0; i < contestants.length; i++) {
+            var username = contestants[i];
+            if (username.toLowerCase().indexOf(keyword) !== -1 || keyword === "") {
+                shownContestants.push(username);
+            }
+        }
+        fillArray();
+    });
+
+    function run() {
+        if (started) {
+            stopGiveaway();
+            $("#hasWinner").css("display", "none");
+            $("#noWinner").css("display", "block");
+        } else {
+            startGiveaway();
+        }
+    }
+
+    function stopGiveaway() {
+        contestants = [];
+        shownContestants = [];
+        clearInterval(winnerInterval);
+        secondsCounter = 0;
+        started = false;
+        socket.emit('command', {type: "stopGiveaway", channel: "<%= channel %>"});
+        $("#runGiveawayButton").text("Start Giveaway!");
+        $("#getWinnerButton").prop("disabled", true);
+        $("#enrolledUsers").empty();
+        $("#userCount").html(0);
+        $("#totalUserCount").html(0);
+        $("#winnerAvatar").prop("src", "/img/user.png");
+        $("#winnerUsername").text("Retrieving Username...");
+        $("#winnerSubscriber").text("Retrieving Subscriber Status...");
+        $("#winnerFollowingSince").text("Retrieving Following Status...");
+        $("#winnerTimer").text("00:00:00");
+        $("#messagesList").empty();
+    }
+
+    function startGiveaway() {
+        $("#winFilter").prop("disabled", true);
+        var keywordValue = $('#keyword').val();
+        if (keywordValue !== "") {
+                socket.emit('command', {type: "newGiveaway", channel: "<%= channel %>", keyword: keywordValue });
+                $("#runGiveawayButton").text("Stop Giveaway!");
+                $("#getWinnerButton").prop("disabled", false);
+                started = true;
+
+            socket.on("info", (json)=>{
+                if (json.type === "result") {
+                    // alert("The winner is: " + json.value);
+                    $("#winnerUsername").text(json.value);
+                } else if (json.type === "newUser") {
+                    console.log("appending...");
+                    contestants.push(json.value);
+                    contestants.sort();
+                    var keyword = $("#searchUsers").val().toLowerCase();
+                    if (json.value.toLowerCase().indexOf(keyword) !== -1 || keyword === "") {
+                        shownContestants.push(json.value);
+                        shownContestants.sort();
+                    }
+                    fillArray();
+                } else if (json.type === "winnerMessage") {
+                    clearInterval(winnerInterval);
+                    secondsCounter = 0;
+                    var d = new Date();
+                    var hours = d.getHours();
+                    var minutes = d.getMinutes();
+                    var seconds = d.getSeconds();
+                    var dateString = (hours < 10 ? '0' : '') + hours + ":" + (minutes < 10 ? '0' : '') + minutes + ":" + (seconds < 10 ? '0' : '') + seconds;
+                    $("#messagesList").append("<li class=\"list-group-item\">" +
+                        "<small><strong>" + dateString + "&nbsp;</strong></small>" +
+                        "<span class='winner-msg'>" + json.message + "</span>" +
+                        "</li>");
+                }
+            });
+
+            socket.on('error', (error)=>{
+                console.log('Socket error: ' + error);
+            });
+        }
+    }
+
+    function fillArray() {
+        var list = $("#enrolledUsers");
+        list.empty();
+        for (var i = 0; i < shownContestants.length; i++) {
+            var item = list.append("<li>" + shownContestants[i] + "</li>");
+        }
+        $("#userCount").html(shownContestants.length);
+        $("#totalUserCount").html(contestants.length);
+    }
+
+    function getResult() {
+        socket.emit('command', {type: "getResult", channel: "<%= channel %>"});
+
+        winnerInterval = setInterval(function () {
+            timerTick();
+        }, 1000, 1000);
+
+        $("#hasWinner").css("display", "block");
+        $("#noWinner").css("display", "none");
+    }
+
+    function timerTick() {
+        secondsCounter++;
+
+        if (secondsCounter >= 60) {
+            secondsCounter = 0;
+            minutesCounter++;
+
+            if (minutesCounter >= 60) {
+                minutesCounter = 0;
+                hoursCounter++;
+            }
+        }
+
+        var timerString = (hoursCounter < 10 ? '0' : '') + hoursCounter + ":" + (minutesCounter < 10 ? '0' : '') + minutesCounter + ":" + (secondsCounter < 10 ? '0' : '') + secondsCounter;
+
+        $("#winnerTimer").text(timerString);
+    }
+	socket.on('chat', (msg)=>{
+	    var list = $("#chat");
+		var d = new Date();
+                    var hours = d.getHours();
+                    var minutes = d.getMinutes();
+                    var seconds = d.getSeconds();
+                    var dateString = (hours < 10 ? '0' : '') + hours + ":" + (minutes < 10 ? '0' : '') + minutes + ":" + (seconds < 10 ? '0' : '') + seconds;
+                    
+        list.append("<li>[" + msg.user + "]: " + msg.content + " (" + dateString + ")</li>");
+	});
+</script>
+</body>
+</html>

@@ -1,0 +1,54 @@
+.column {
+    padding: 10px 20px 10px 20px;
+}
+
+.column-content {
+    background-color: #ffffff;
+    padding: 10px 20px 10px 20px;
+    border: 1px solid #e7eaec;
+    min-height: 450px;
+    border-radius: 5px;
+}
+
+.titleGiveaway {
+    font-family: "Open Sans", sans-serif;
+    font-size: 21px;
+    font-style: normal;
+    font-weight: 100;
+    margin-bottom: 10px;
+    line-height: 26px;
+}
+
+.userCount {
+    font-family: "Open Sans", Helvetica, sans-serif;
+    float: right;
+    font-size: 14px;
+    line-height: 1.42857143
+}
+
+.control-label {
+    padding-top: 7px;
+}
+
+.winner-avatar {
+    width: 90px;
+    height: 90px;
+    float: left;
+    border-radius: 50%;
+}
+
+.winner-info {
+    padding-left: 100px;
+}
+
+.winner-msg {
+    font-size: 1.15rem;
+}
+
+#winnerTimer {
+    float: right;
+    font-size: 0.5em;
+    font-weight: 100;
+    padding-top: 1.15rem;
+    color: #676a6c;
+}

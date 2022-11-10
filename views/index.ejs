@@ -1,0 +1,682 @@
+
+<!--suppress JSUnresolvedLibraryURL, JSJQueryEfficiency, JSUnresolvedFunction, JSUnresolvedVariable, JSUnusedLocalSymbols, HtmlFormInputWithoutLabel -->
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+ <script src="//kit.fontawesome.com/7b3fe3045c.js"></script>
+ <link rel=icon href="<%= icon %>" sizes="16x16" type="image/png">
+ <link rel='apple-touch-icon' type='image/png' href='<%= icon %>'> <!-- iPhone -->
+ <link rel='apple-touch-icon' type='image/png' sizes='72x72' href='<%= icon %>'> <!-- iPad -->
+ <link rel='apple-touch-icon' type='image/png' sizes='114x114' href='<%= icon %>'> <!-- iPhone4 -->
+ <meta name="<%= title %>" content="lsForums">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <title><%= title %></title>
+
+    <!-- Bootstrap -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/main.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600" rel="stylesheet">
+</head>
+<body>
+<div class="container-fluid" style="padding: 0 0 0 0 !important;">
+            <div id="mySidenav" class="sidenav">
+            <a class="title" href="javascript:void(0)"><img width="50" height="50" src="<%= icon %>" /></br><span><%= title %></span></a>
+            <a class = activeNav href="/" style="font-size: medium"><span class="glyphicon glyphicon-flash"></span>&nbsp;Commands</a>
+            <a  href="giveaway" style="font-size: medium"><span class="glyphicon glyphicon-gift"></span>&nbsp;&nbsp;Giveaway</a>
+            <!--<a  href="#" style="font-size: medium"><span class="glyphicon glyphicon-info-sign"></span> &nbsp;About</a>-->
+        </div>    <div id="main">
+        <!--    <button class="btn" onclick="toggleNav()" style="background-color: #1d89cf"><span class="glyphicon glyphicon-menu-hamburger" aria-hidden="true" style="color: #fff;"></span></button> <h1>Hello, world2!</h1>-->
+        <div class="table-title">
+            <br>
+            Commands: <%= channel %><br>
+            <ol class="location breadcrumb">
+                <li>Home</li>
+                <li>Commands: <%= user %> </li>
+            </ol>
+        </div>
+        <br>
+        <div class="content-box">
+            <div class="between-table-title">
+                <h5 style="display: inline-block;">Channel Commands:</h5>
+                <span style="float:right; padding-right: 15px;"><button data-toggle="modal" data-target="#myModal"
+                                                                        class="btn btn-info"
+                                                                        style="background-color: #1d89cf; color: white"><span
+                            class="glyphicon glyphicon-plus" style="color: white"></span> Add command</button></span>
+
+            </div>
+            <hr style="margin-top: 10px !important; margin-bottom: 10px !important;">
+            <div class="between-table">
+                Show <select id="nElements" class="form-control" style="width: auto; display: inline-block;">
+                    <option value="10" selected>10</option>
+                    <option value="25">25</option>
+                    <option value="75">75</option>
+                    <option value="100">100</option>
+                </select> entries
+                <div style="float:right">Search: <input class="form-control" id="searchCommands" name="searchCommands" title="searchCommands" style="width: auto !important; display: inline-block !important;"/></div>
+            </div>
+            <div class="table">
+                <table class="table" style="border: 1px solid #ddd;" id="commandsTable">
+                    <tr role="row" class="table-row">
+                        <th style="font-size: 13px; font-weight: bold; width: 20%;" onclick="sortData(currentlySortedEnums.Command, true)">Command<span class="glyphicon glyphicon-sort-by-attributes" id="commandSortIcon" style="float:right"></span>
+                        </th>
+                        <th onclick="sortData(currentlySortedEnums.Message, true)" style="font-size: 13px; font-weight: bold; ">Message<span class="glyphicon glyphicon-sort" id="messageSortIcon" style="float:right"></span></th>
+                        <th onclick="sortData(currentlySortedEnums.Userlevel, true)" style="font-size: 13px; font-weight: bold; width: 20%;">Userlevel<span class="glyphicon glyphicon-sort" id="userlevelSortIcon" style="float:right"></span></th>
+                        <th style="font-size: 13px; font-weight: bold; width: auto; min-width: 70px;">Actions</th>
+                    </tr>
+                </table>
+                <div id="entries" style="float:left">
+                    Showing %s - %s1 of %s3 entries
+                </div>
+                <ul style="float: right; margin: 0 !important;" id="pagination" class="pagination">
+                    <li id="first" class=" specialButton"><a>First</a></li>
+                    <li id="previous" class="disabled specialButton"><a>Previous</a></li>
+                    <li id="none" class="active" value="1"><a class="pageLink">1</a></li>
+                    <li id="next" class=" specialButton"><a>Next</a></li>
+                    <li id="last" class=" specialButton"><a>Last</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modals Start Here-->
+<div id="myModal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Add command</h4>
+            </div>
+            <form id="addCommandForm">
+                <input type="hidden" id="channel" name="channel" value="<%= user %>"/>
+                <div class="modal-body">
+                    <table style="width: 100%;">
+                        <tr class="modalRow">
+                            <td class="modalTitle">Command:</td>
+                            <td class="modalInput">
+                                <p><input class="form-control modalInput" id="commandInput" name="commandInput"
+                                          title="commandInput"
+                                          placeholder="youtube"/></p>
+                                <p>This is your command name. It is always preceded by an exclamation mark (<%= prefix %>). You do
+                                    NOT have to type the exclamation mark.</p>
+                            </td>
+                        </tr>
+                        <tr class="modalRow">
+                            <td class="modalTitle">Message:</td>
+                            <td class="modalInput">
+                                <p><input class="form-control modalInput" id="messageInput" name="messageInput"
+                                          title="messageInput"
+                                          placeholder="Subscribe to my Youtube: https://youtube.com/your/link"/></p>
+                                <p>This is de response from the bot after the command has been run. You can use <i>@user@</i>
+                                    to replace that with the username of the person issuing the command</p>
+                            </td>
+                        </tr>
+                        <tr class="modalRow">
+                            <td class="modalTitle">Userlevel:</td>
+                            <td class="modalInput">
+                                <p><select class="form-control" id="userlevel" name="userlevel" title="userlevel">
+                                        <option value="everyone">Everyone</option>
+                                        <option value="mod">Moderator</option>
+                                        <option value="caster">Caster</option>
+                                    </select></p>
+                                <p>This is the minimum userlevel required to make the bot respond to the command.
+                                    Userlevels are listed from lowest to highest</p>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </form>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <input type="submit" class="btn btn-default" data-dismiss="modal" onclick="addCommand()"
+                       style="color: white; background-color: #1d89cf" value="Add Command"/>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<div id="editModal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Add command</h4>
+            </div>
+            <form id="editCommandForm">
+                <input type="hidden" id="channelEdit" name="channel" value="<%= user %>"/>
+                <input type="hidden" id="originalCommand" name="originalCommand"/>
+                <div class="modal-body">
+                    <table style="width: 100%;">
+                        <tr class="modalRow">
+                            <td class="modalTitle">Command:</td>
+                            <td class="modalInput">
+                                <p><input class="form-control modalInput" id="commandInputEdit" name="commandInputEdit"
+                                          title="commandInputEdit"
+                                          placeholder="youtube"/></p>
+                                <p>This is your command name. It is always preceded by an exclamation mark (<%= prefix %>). You do
+                                    NOT have to type the exclamation mark.</p>
+                            </td>
+                        </tr>
+                        <tr class="modalRow">
+                            <td class="modalTitle">Message:</td>
+                            <td class="modalInput">
+                                <p><input class="form-control modalInput" id="messageInputEdit" name="messageInputEdit"
+                                          title="messageInputEdit"
+                                          placeholder="Subscribe to my Youtube: https://youtube.com/your/link"/></p>
+                                <p>This is de response from the bot after the command has been run. You can use <i>@user@</i>
+                                    to replace that with the username of the person issuing the command </p>
+                            </td>
+                        </tr>
+                        <tr class="modalRow">
+                            <td class="modalTitle">Userlevel:</td>
+                            <td class="modalInput">
+                                <p><select class="form-control" id="userlevelEdit" name="userlevelEdit"
+                                           title="userlevelEdit">
+                                        <option value="everyone">Everyone</option>
+                                        <option value="mod">Moderator</option>
+                                        <option value="caster">Caster</option>
+                                    </select></p>
+                                <p>This is the minimum userlevel required to make the bot respond to the command.
+                                    Userlevels are listed from lowest to highest</p>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </form>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <input type="submit" id="editSubmit" class="btn btn-default" data-dismiss="modal"
+                       onclick="saveEditCommand()"
+                       style="color: white; background-color: #1d89cf" value="Edit Command"/>
+            </div>
+        </div>
+
+    </div>
+</div>
+<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="js/bootstrap.min.js"></script>
+<script type="application/javascript">
+    var originalData = <%- JSON.stringify(data) %>;
+    var currentData = originalData;
+    var amountOfPages;
+    var page = 1;
+    var sortOrderEnums = {AZ: 0, ZA: 1};
+    var sortOrder = sortOrderEnums.ZA;
+    var currentlySortedEnums = {Command: 0, Message: 1, Userlevel: 2};
+    var currentlySorted = currentlySortedEnums.Command;
+
+    $(document).ready(function () {
+        currentData = originalData;
+        loadData(currentData);
+        loadPages(originalData);
+        showEntries();
+        sortData(currentlySortedEnums.Command, true);
+    });
+
+    function deleteCommand(channel, command) {
+        //AJAX
+        var request;
+
+        if (request) {
+            request.abort();
+        }
+
+        var sendInfo = {
+            channel: channel,
+            command: command
+        };
+
+        request = $.ajax({
+            url: "/deleteCommand",
+            type: "post",
+            data: sendInfo
+        });
+
+        request.done(function (json, textStatus, jqXHR) {
+            if (json['success'] === true) {
+                originalData = json['data']["commands"];
+                currentData = originalData;
+                loadData(currentData);
+            } else {
+            }
+        });
+
+        request.fail(function (jqXHR, textStatus, errorThrown) {
+            console.error("Error: " + textStatus, errorThrown);
+        });
+
+        request.always(function () {
+            sortData(currentlySorted, false);
+        });
+    }
+
+    function saveEditCommand(command) {
+        //AJAX
+        var request;
+
+        if (request) {
+            request.abort();
+        }
+
+        var $form = $("#editCommandForm");
+        var $inputs = $form.find("input, select");
+        var serializedData = $form.serialize();
+        $inputs.prop("disabled", true);
+
+        request = $.ajax({
+            url: "/editCommand",
+            type: "post",
+            data: serializedData
+        });
+
+        request.done(function (json, textStatus, jqXHR) {
+            if (json['success'] === true) {
+                originalData = json['data']["commands"];
+                currentData = originalData;
+                loadData(currentData);
+            } else {
+            }
+        });
+
+        request.fail(function (jqXHR, textStatus, errorThrown) {
+            console.error("Error: " + textStatus, errorThrown);
+        });
+
+        request.always(function () {
+            $inputs.prop("disabled", false);
+            $inputs.val('');
+            var $tempimputs = $form.find("select");
+            $tempimputs.val('everyone');
+            $('#channelEdit').val('<%= user %>');
+            sortData(currentlySorted, false);
+        });
+    }
+
+    function editCommand(command) {
+        var commandData = null;
+        for (var i = 0; i < originalData.length; i++) {
+            var temp = originalData[i];
+            if (temp["command"] === command) {
+                commandData = temp;
+                break;
+            }
+        }
+        if (commandData != null) {
+            $('#commandInputEdit').val(commandData["command"]);
+            $('#originalCommand').val(commandData["command"]);
+            $('#messageInputEdit').val(commandData["message"]);
+            $('#userlevelEdit').val(commandData["userlevel"]);
+            $('#editSubmit').attr("onclick", "saveEditCommand('" + commandData["command"] + "')");
+            $('#editModal').modal("show");
+        } else {
+            console.error("An unknown (and impossible) error occurred");
+        }
+    }
+
+    function loadPages(contents) {
+        var value = $('#nElements').val();
+        amountOfPages = contents.length / value;
+        var pages = amountOfPages;
+        if (pages > 6) {
+            $('#pagination li').slice(3, -2).remove();
+            $('#next').before('<li value="' + pages + '"><a class="pageLink">' + pages + '</a></li>');
+            $('#next').prev().before('<li id="lastDots" class="disabled"><a class="disabled">...</a></li>');
+            var half = Math.floor(pages / 2);
+            $("#lastDots").before('<li value="' + 2 + '"><a class="pageLink">' + 2 + '</a></li>');
+            $("#lastDots").before('<li value="' + 3 + '"><a class="pageLink">' + 3 + '</a></li>');
+            $("#lastDots").before('<li value="' + 4 + '"><a class="pageLink">' + 4 + '</a></li>');
+        } else {
+            pages--;
+            var pageCounter = 1;
+            $('#pagination li').slice(3, -2).remove();
+            while (pages > 0) {
+                pageCounter++;
+                $('#next').before('<li value="' + pageCounter + '"><a class="pageLink">' + pageCounter + '</a></li>');
+                pages--;
+            }
+        }
+        if (amountOfPages <= 1) {
+            $('#next').addClass('disabled');
+            $('#last').addClass('disabled');
+            $('#first').addClass('disabled');
+            $('#previous').addClass('disabled');
+        } else {
+            if (page === '1') {
+                $('#next').removeClass('disabled');
+                $('#last').removeClass('disabled');
+                $('#first').addClass('disabled');
+                $('#previous').addClass('disabled');
+            } else if (page === "" + Math.ceil(amountOfPages)) {
+                $('#next').addClass('disabled');
+                $('#last').addClass('disabled');
+                $('#first').removeClass('disabled');
+                $('#previous').removeClass('disabled');
+            } else {
+                $('#next').removeClass('disabled');
+                $('#last').removeClass('disabled');
+                $('#first').removeClass('disabled');
+                $('#previous').removeClass('disabled');
+            }
+        }
+        loadData(contents);
+    }
+
+    $('#nElements').change(function () {
+        currentData = originalData;
+        loadPages(currentData);
+        $("#searchCommands").val("");
+        showEntries();
+        $('#none').trigger("click");
+    });
+
+    $(document).on('click', '#last', function () {
+        if (!$(this).hasClass('disabled')) {
+            $(".pagination li:nth-last-child(3) a").trigger("click");
+            $('#previous').removeClass('disabled');
+            $('#next').addClass('disabled');
+        }
+    });
+
+    $(document).on('click', '#first', function () {
+        if (!$(this).hasClass('disabled')) {
+            $(".pagination li:nth-child(3) a").trigger("click");
+            $('#previous').addClass('disabled');
+            $('#next').removeClass('disabled');
+        }
+    });
+
+    $(document).on('click', '#next', function () {
+        if (!$(this).hasClass("disabled")) {
+            $('#previous').removeClass('disabled');
+            $(".active").next().find("a").not(".specialButton").trigger("click");
+        }
+    });
+
+    $(document).on('click', '#previous', function () {
+        if (!$(this).hasClass("disabled")) {
+            $('#next').removeClass('disabled');
+            $(".active").prev().find("a").not(".specialButton").trigger("click");
+        }
+    });
+
+    $(document).on('click', '.pageLink', function () {
+        page = $(this).closest('li').attr('value');
+        if (page > 3 && page < amountOfPages - 2) {
+            $('#pagination li').slice(3, -3).remove();
+            $('#next').prev().before('<li id="lastDots" class="disabled"><a class="disabled">...</a></li>');
+            if (amountOfPages > 5) {
+                $('#none').after('<li id="firstDots" class="disabled"><a class="disabled">...</a></li>');
+            }
+            page++;
+            $('#firstDots').after('<li value="' + (page) + '"><a class="pageLink">' + (page) + '</a></li>');
+            page--;
+            $('#firstDots').after('<li value="' + page + '" class="active"><a class="pageLink">' + page + '</a></li>');
+            $('#firstDots').after('<li value="' + (page - 1) + '"><a class="pageLink">' + (page - 1) + '</a></li>');
+        } else if (page <= 3 && amountOfPages > 3) {
+            $('#pagination li').slice(3, -3).remove();
+            if (Math.ceil(amountOfPages) > 5) {
+                $('#next').prev().before('<li id="lastDots" class="disabled"><a class="disabled">...</a></li>');
+            }
+            if (Math.ceil(amountOfPages) > 1) {
+                $('#none').after('<li id="ntwo" value="' + 2 + '"><a class="pageLink">' + 2 + '</a></li>');
+            }
+            if (Math.ceil(amountOfPages) > 2) {
+                $('#ntwo').after('<li id="nthree" value="' + 3 + '"><a class="pageLink">' + 3 + '</a></li>');
+            }
+            if (Math.ceil(amountOfPages) > 3) {
+                $('#nthree').after('<li id="nfour" value="' + 4 + '"><a class="pageLink">' + 4 + '</a></li>');
+            }
+        } else if (amountOfPages <= 3) {
+            $('#pagination li').slice(3, -3).remove();
+            if (Math.ceil(amountOfPages) > 2) {
+                $('#none').after('<li id="ntwo" value="' + 2 + '"><a class="pageLink">' + 2 + '</a></li>');
+            }
+        } else if (page <= amountOfPages) {
+            var ceiled = Math.ceil(amountOfPages);
+            $('#pagination li').slice(3, -3).remove();
+            if (amountOfPages > 5) {
+                $('#none').after('<li id="firstDots" class="disabled"><a class="disabled">...</a></li>');
+                $('#firstDots').after('<li value="' + (ceiled - 3) + '"><a class="pageLink">' + (ceiled - 3) + '</a></li>');
+                $('#firstDots').next().after('<li value="' + (ceiled - 2) + '"><a class="pageLink">' + (ceiled - 2) + '</a></li>');
+                $('#firstDots').next().next().after('<li value="' + (ceiled - 1) + '"><a class="pageLink">' + (ceiled - 1) + '</a></li>');
+            } else {
+                $('#none').after('<li value="' + (ceiled - 3) + '"><a class="pageLink">' + (ceiled - 3) + '</a></li>');
+                $('#none').next().after('<li value="' + (ceiled - 2) + '"><a class="pageLink">' + (ceiled - 2) + '</a></li>');
+                $('#none').next().next().after('<li value="' + (ceiled - 1) + '"><a class="pageLink">' + (ceiled - 1) + '</a></li>');
+            }
+        }
+
+        if (amountOfPages <= 1) {
+            $('#next').addClass('disabled');
+            $('#last').addClass('disabled');
+            $('#first').addClass('disabled');
+            $('#previous').addClass('disabled');
+        } else {
+            if (page === '1') {
+                $('#next').removeClass('disabled');
+                $('#last').removeClass('disabled');
+                $('#first').addClass('disabled');
+                $('#previous').addClass('disabled');
+            } else if (page === "" + Math.ceil(amountOfPages)) {
+                $('#next').addClass('disabled');
+                $('#last').addClass('disabled');
+                $('#first').removeClass('disabled');
+                $('#previous').removeClass('disabled');
+            } else {
+                $('#next').removeClass('disabled');
+                $('#last').removeClass('disabled');
+                $('#first').removeClass('disabled');
+                $('#previous').removeClass('disabled');
+            }
+        }
+        $(".pagination>li.active").removeClass("active");
+        $(".pagination li[value=" + page + "]").addClass("active");
+
+        if (page !== '1') {
+            $('#previous').removeClass('disabled');
+        } else {
+            $('#previous').addClass('disabled');
+        }
+        var nElements = $('#nElements').val();
+        if (page !== "" + Math.ceil(amountOfPages)) {
+            $('#next').removeClass('disabled');
+        } else {
+            $('#next').addClass('disabled');
+        }
+        showEntries();
+        loadDataPage(nElements * (page - 1), nElements * page, currentData);
+    });
+
+    function showEntries() {
+        var nElements = $('#nElements').val();
+        if (page < amountOfPages) {
+            $('#entries').text("Showing " + (nElements * (page - 1) + 1) + " - " + (nElements * page) + " of " + nElements * amountOfPages + " entries");
+        } else {
+            $('#entries').text("Showing " + (nElements * (page - 1) + 1) + " - " + (amountOfPages * nElements) + " of " + nElements * amountOfPages + " entries");
+        }
+    }
+
+    function loadData(data) {
+        var nElements = $('#nElements').val();
+        loadDataPage(0, 1 * nElements, data);
+    }
+
+    function loadDataPage(start, page, data) {
+        $('#commandsTable').find('tr').remove('.table-data');
+        var r = [], j = -1;
+        for (var i = start; i < data.length && i < page; i++) {
+            r[++j] = '<tr class=\'table-row table-data\'><td>';
+            r[++j] = data[i]["command"];
+            r[++j] = '</td><td>';
+            r[++j] = data[i]["message"];
+            r[++j] = '</td><td>';
+            r[++j] = data[i]["userlevel"];
+            r[++j] = '</td><td>';
+            r[++j] = '<button class="btn btn-sm btn-warning btn-action" onclick="editCommand(\'' + data[i]["command"] + '\')"><span class="glyphicon glyphicon-edit"></span></button>&nbsp;<button class="btn btn-sm btn-danger btn-action" onclick="deleteCommand(\'<%= user %>\', \'' + data[i]["command"] + '\')"><span class="glyphicon glyphicon-trash"></span></button>';
+            r[++j] = '</td></tr>';
+        }
+        $('#commandsTable').find('tr:first').after(r.join(''));
+        showEntries();
+    }
+
+    function addCommand() {
+        //AJAX
+        var request;
+
+        if (request) {
+            request.abort();
+        }
+
+        var $form = $("#addCommandForm");
+        var $inputs = $form.find("input, select");
+        var serializedData = $form.serialize();
+
+        $inputs.prop("disabled", true);
+
+        request = $.ajax({
+            url: "/addCommand",
+            type: "post",
+            data: serializedData
+        });
+
+        request.done(function (json, textStatus, jqXHR) {
+            if (json['success'] === true) {
+                originalData = json['data']["commands"];
+                currentData = originalData;
+                loadData(currentData);
+            } else {
+            }
+        });
+
+        request.fail(function (jqXHR, textStatus, errorThrown) {
+            console.error("Error: " + textStatus, errorThrown);
+        });
+
+        request.always(function () {
+            $inputs.prop("disabled", false);
+            $inputs.val('');
+            var $tempimputs = $form.find("select");
+            $tempimputs.val('everyone');
+            $('#channel').val('<%= channel %>');
+            sortData(currentlySorted, false);
+        });
+    }
+
+    function changeIcon(iconName){
+        if (iconName === "command"){
+            $('#commandSortIcon').removeClass();
+            if (sortOrder === sortOrderEnums.AZ){
+                $('#commandSortIcon').addClass("glyphicon glyphicon-sort-by-attributes");
+            } else {
+                $('#commandSortIcon').addClass("glyphicon glyphicon-sort-by-attributes-alt");
+            }
+            $('#messageSortIcon').removeClass();
+            $('#messageSortIcon').addClass("glyphicon glyphicon-sort");
+            $('#userlevelSortIcon').removeClass();
+            $('#userlevelSortIcon').addClass("glyphicon glyphicon-sort");
+        } else if (iconName === "message"){
+            $('#messageSortIcon').removeClass();
+            if (sortOrder === sortOrderEnums.AZ){
+                $('#messageSortIcon').addClass("glyphicon glyphicon-sort-by-attributes");
+            } else {
+                $('#messageSortIcon').addClass("glyphicon glyphicon-sort-by-attributes-alt");
+            }
+            $('#commandSortIcon').removeClass();
+            $('#commandSortIcon').addClass("glyphicon glyphicon-sort");
+            $('#userlevelSortIcon').removeClass();
+            $('#userlevelSortIcon').addClass("glyphicon glyphicon-sort");
+        } else if (iconName === "userlevel") {
+            $('#userlevelSortIcon').removeClass();
+            if (sortOrder === sortOrderEnums.AZ){
+                $('#userlevelSortIcon').addClass("glyphicon glyphicon-sort-by-attributes");
+            } else {
+                $('#userlevelSortIcon').addClass("glyphicon glyphicon-sort-by-attributes-alt");
+            }
+            $('#messageSortIcon').removeClass();
+            $('#messageSortIcon').addClass("glyphicon glyphicon-sort");
+            $('#commandSortIcon').removeClass();
+            $('#commandSortIcon').addClass("glyphicon glyphicon-sort");
+        }
+    }
+
+    /**
+     * Sort the data in the table
+     * @param type The type to sort on (command, message, userlevel)
+     * @param check True if sort order needs to be reversed, false if not (Default: True)
+     */
+    function sortData(type, check) {
+        if (currentlySorted !== type) {
+            sortOrder = sortOrderEnums.ZA;
+        }
+        if(check) {
+            if (sortOrder === sortOrderEnums.AZ) {
+                sortOrder = sortOrderEnums.ZA;
+            } else {
+                sortOrder = sortOrderEnums.AZ;
+            }
+        }
+        if (sortOrder === sortOrderEnums.AZ) {
+            currentlySorted = type;
+            originalData.sort(function (a, b) {
+                if (type === currentlySortedEnums.Command) {
+                    changeIcon("command");
+                    return a.command.localeCompare(b.command);
+                } else if (type === currentlySortedEnums.Message) {
+                    changeIcon("message");
+                    return a.message.localeCompare(b.message);
+                } else if (type === currentlySortedEnums.Userlevel) {
+                    changeIcon("userlevel");
+                    return a.userlevel.localeCompare(b.userlevel);
+                }
+            });
+        } else {
+            currentlySorted = type;
+            originalData.sort(function (a, b) {
+                if (type === currentlySortedEnums.Command) {
+                    changeIcon("command");
+                    return b.command.localeCompare(a.command);
+                } else if (type === currentlySortedEnums.Message) {
+                    changeIcon("message");
+                    return b.message.localeCompare(a.message);
+                } else if (type === currentlySortedEnums.Userlevel) {
+                    changeIcon("userlevel");
+                    return b.userlevel.localeCompare(a.userlevel);
+                }
+            });
+        }
+        currentData = originalData;
+        loadData(currentData);
+        $('#none>a').trigger("click");
+    }
+
+    $('#searchCommands').keyup(function(){
+        var query = $('#searchCommands').val();
+        console.log(query);
+        if(query !== "") {
+            var temp = [];
+            for (i = 0; i < originalData.length; i++) {
+                var checkingValue = originalData[i];
+                console.log("checkingValue: " + checkingValue);
+                if (checkingValue["command"].includes(query) || checkingValue["message"].includes(query) || checkingValue["userlevel"].includes(query)) {
+                    temp.push(checkingValue);
+                }
+            }
+            currentData = temp;
+            loadPages(currentData);
+        } else {
+            currentData = originalData;
+            loadPages(originalData);
+        }
+    });
+</script>
+</body>
+</html>
